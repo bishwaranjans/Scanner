@@ -1,0 +1,33 @@
+﻿::deep .text-center {
+    text-align: center;
+}
+
+::deep .main-text {
+    background-color: var(--nobbno-palette-background-darker);
+    padding: 32px 32px 0 32px;
+    display: flex;
+    flex-direction: column;
+    max-height: 460px;
+    text-align: center;
+}
+
+#videoview {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    display: flex;
+    align-self: center;
+}
+
+#videoContainer {
+    width: 100%;
+    height: 100%;
+}
+
+#overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}

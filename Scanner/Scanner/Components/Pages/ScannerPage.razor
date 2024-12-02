@@ -1,0 +1,15 @@
+﻿@page "/scanner"
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
+<PageTitle>Scanner</PageTitle>
+
+@inherits ScannerPageBase
+
+<div class="main-text">
+    <h1>Scanner</h1>
+    <div id="videoview">
+        <div class="dce-video-container" id="@VideoContainerId"></div>
+        <canvas id="@OverlayId"></canvas>
+    </div>
+
+</div>
