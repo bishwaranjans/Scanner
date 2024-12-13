@@ -1,4 +1,4 @@
-﻿let dotnetRef = null;
+let dotnetRef = null;
 let overlay = null;
 let context = null;
 let cvr = null;
@@ -56,19 +56,17 @@ async function initScanner(videoId, overlayId) {
         filter.enableResultCrossVerification("barcode", true);
         // Filter out duplicate barcodes within 3 seconds.
         filter.enableResultDeduplication("barcode", true);
+        filter.setDuplicateForgetTime("barcode", 20000);
+
         await cvr.addResultFilter(filter);
 
         cvr.setInput(cameraEnhancerInstance);
 
         cvr.addResultReceiver({
-            onCapturedResultReceived: async (result) => {
-                await showBarcodeResults(result, dotnetRef);
-            }
-        });
-
-        cvr.addResultReceiver({
-            onDecodedBarcodesReceived: (result) => {
+            onDecodedBarcodesReceived: async (result) => {
+             
                 if (!result.barcodeResultItems.length) return;
+                await showBarcodeResults(result, dotnetRef);
             }
         });
 
@@ -147,8 +145,9 @@ async function showBarcodeResults(result, dotnetRef) {
     let txts = [];
     try {
         let localization;
-        let items = result.items
-        if (items.length > 0) {
+        let items = result.barcodeResultItems;
+
+        if (items != undefined && items.length > 0) {
             for (var i = 0; i < items.length; ++i) {
 
                 if (items[i].type !== Dynamsoft.Core.EnumCapturedResultItemType.CRIT_BARCODE) {
@@ -173,13 +172,15 @@ async function showBarcodeResults(result, dotnetRef) {
     }
 
     let barcoderesults = txts.join(', ');
-    if (txts.length == 0) {
+    if (txts.length === 0) {
         barcoderesults = 'No barcode found';
     }
 
     if (dotnetRef && txts.length > 0) {
         await dotnetRef.invokeMethodAsync('ReturnBarcodeResults', barcoderesults);
     }
+
+    await clearOverlay();
 }
 
 async function updateResolution() {
@@ -206,11 +207,13 @@ async function openCamera() {
 
 async function disposeScanner() {
     if (cvr) {
+        cvr.stopCapturing();
         cvr.dispose();
         cvr = null;
     }
 
     if (cameraEnhancerInstance) {
+        await cameraEnhancerInstance.close();
         cameraEnhancerInstance.dispose();
         cameraEnhancerInstance = null;
     }
